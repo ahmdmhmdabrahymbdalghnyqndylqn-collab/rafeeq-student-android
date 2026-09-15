@@ -1,0 +1,2 @@
+import type {Metadata,Viewport} from "next";import "./globals.css";
+export const metadata:Metadata={title:"Rafeeq | رفيق الطالب",description:"نظّم وقتك، ادرس بتركيز، وتابع إنجازك مع رفيق الطالب.",manifest:"/manifest.webmanifest",icons:{icon:"/favicon.svg",apple:"/favicon.svg"}};export const viewport:Viewport={themeColor:"#5B5CE2",width:"device-width",initialScale:1,viewportFit:"cover"};export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="ar" dir="rtl"><body>{children}</body></html>}
