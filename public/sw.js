@@ -1,5 +1,5 @@
-const CACHE = "rafeeq-v3";
-const ASSETS = ["/", "/app", "/manifest.webmanifest", "/favicon.svg", "/rafeeq-students-hero.png"];
+const CACHE = "rafeeq-v4";
+const ASSETS = ["/", "/app", "/manifest.webmanifest", "/favicon.svg", "/icon-192.png", "/icon-512.png", "/rafeeq-students-hero.png"];
 
 self.addEventListener("install", event => {
   self.skipWaiting();
