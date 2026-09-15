@@ -1,4 +1,4 @@
-const CACHE = "rafeeq-v4";
+const CACHE = "rafeeq-v5";
 const ASSETS = ["/", "/app", "/manifest.webmanifest", "/favicon.svg", "/icon-192.png", "/icon-512.png", "/rafeeq-students-hero.png"];
 
 self.addEventListener("install", event => {
@@ -15,7 +15,8 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("fetch", event => {
-  if (event.request.method !== "GET") return;
+  const url = new URL(event.request.url);
+  if (event.request.method !== "GET" || url.origin !== self.location.origin || url.pathname.startsWith("/api/") || url.pathname.endsWith(".pdf")) return;
   event.respondWith(
     fetch(event.request)
       .then(response => {
@@ -25,6 +26,6 @@ self.addEventListener("fetch", event => {
         }
         return response;
       })
-      .catch(() => caches.match(event.request))
+      .catch(async () => (await caches.match(event.request)) || new Response("Offline", {status:503}))
   );
 });
