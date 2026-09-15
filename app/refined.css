@@ -1,4 +1,5 @@
 /* Rafeeq: quiet, editorial surfaces and a consistent brand. */
+.launch-screen{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#fff;color:#182238;font-size:25px}.launch-screen img{object-fit:contain;border-radius:22px}
 :root{--ink:#182238;--muted:#626b79;--line:#e2e6ec;--soft:#f3f5f8;--indigo:#374875;--teal:#337a70;--shadow:0 8px 24px #18223808}
 body{font-size:16px;line-height:1.65;background:#fff}
 button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}

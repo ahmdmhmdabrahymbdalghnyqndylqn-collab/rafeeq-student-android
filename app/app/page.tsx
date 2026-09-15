@@ -1,3 +1,4 @@
+import LoadingBrand from "../loading-brand";
 "use client";
 import Image from "next/image";
 import {useEffect,useState} from "react";
@@ -6,7 +7,7 @@ import Workspace from "./workspace";
 export default function StudentApp(){
  const [profile,setProfile]=useState<any>(undefined);
  useEffect(()=>{fetch("/api/auth",{cache:"no-store"}).then(r=>r.json()).then((x:any)=>setProfile(x.user)).catch(()=>setProfile(null))},[]);
- if(profile===undefined)return <div className="dash-loading">Rafeeq</div>;
+ if(profile===undefined)return <LoadingBrand/>;
  if(!profile)return <StudentAuth done={setProfile}/>;
  return <Workspace profile={profile}/>;
 }

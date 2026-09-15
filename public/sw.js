@@ -1,4 +1,4 @@
-const CACHE = "rafeeq-v6";
+const CACHE = "rafeeq-v7";
 const ASSETS = ["/", "/app", "/manifest.webmanifest", "/graduation-192.png", "/graduation-192.png", "/graduation-512.png", "/rafeeq-students-hero.png"];
 
 self.addEventListener("install", event => {

@@ -1,0 +1,1 @@
+export default function LoadingBrand(){return <div className="launch-screen" role="status" aria-label="جارٍ فتح رفيق"><img src="/graduation-192.png?v=7" alt="" width="96" height="96"/><b>Rafeeq</b></div>}
