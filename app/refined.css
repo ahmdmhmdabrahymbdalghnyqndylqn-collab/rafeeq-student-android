@@ -4,7 +4,7 @@ body{font-size:16px;line-height:1.65;background:#fff}
 button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}
 button{cursor:pointer}
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #8197c0;outline-offset:3px}
-.brand-mark{width:48px;height:48px;border-radius:11px;background-image:url("/icon-192.png");box-shadow:none;flex-shrink:0}
+.brand-mark{width:48px;height:48px;border-radius:11px;background-image:url("/graduation-192.png");box-shadow:none;flex-shrink:0}
 .brand-image{display:block;width:48px;height:48px;object-fit:contain;border-radius:11px;flex-shrink:0}
 .brand b{font-size:23px;letter-spacing:-.6px;font-weight:750}.brand small{font-size:12px;line-height:1.5;margin-top:0}
 .btn,.btn.big{border-radius:8px;box-shadow:none;min-height:44px;font-size:14px}

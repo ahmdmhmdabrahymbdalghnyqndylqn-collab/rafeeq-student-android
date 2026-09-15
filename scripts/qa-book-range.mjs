@@ -1,0 +1,14 @@
+import {readFile} from 'node:fs/promises';
+import ts from 'typescript';
+import assert from 'node:assert/strict';
+const bytes=Buffer.from('%PDF-test-content');
+globalThis.bookTestEnv={DB:{prepare(){return {bind(){return this},first:async()=>({title:'كتاب الفيزياء'}),all:async()=>({results:[]})}}},BOOKS:{head:async()=>({size:bytes.length,httpEtag:'"test"'}),get:async(key,options)=>({body:options?bytes.subarray(options.range.offset,options.range.offset+options.range.length):bytes})}};
+const source=(await readFile('app/api/books/route.ts','utf8')).replace(/import\s*\{env\}\s*from\s*"cloudflare:workers";/,'const env=globalThis.bookTestEnv;');
+const js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText;
+const {GET,HEAD}=await import('data:text/javascript;base64,'+Buffer.from(js).toString('base64'));
+let r=await GET(new Request('https://test/api/books?key=test',{headers:{range:'bytes=0-4'}}));assert.equal(r.status,206);assert.equal(r.headers.get('content-range'),'bytes 0-4/17');assert.equal(await r.text(),'%PDF-');
+r=await GET(new Request('https://test/api/books?key=test',{headers:{range:'bytes=-7'}}));assert.equal(r.status,206);assert.equal(await r.text(),'content');
+r=await GET(new Request('https://test/api/books?key=test',{headers:{range:'bytes=100-200'}}));assert.equal(r.status,416);
+r=await HEAD(new Request('https://test/api/books?key=test'));assert.equal(r.headers.get('content-length'),'17');assert.equal(await r.text(),'');
+r=await GET(new Request('https://test/api/books?key=test&download=1'));assert.ok(r.headers.get('content-disposition').startsWith('attachment'));assert.equal(await r.text(),bytes.toString());
+console.log('PASS: PDF range, suffix, invalid range, HEAD size, full download.');

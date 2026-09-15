@@ -51,12 +51,12 @@ export async function POST(request: Request) {
       const id = Number(result.meta.last_row_id);
       const user = await E.DB.prepare("SELECT id,name,email,country,track,language FROM users WHERE id=?").bind(id).first();
       if (!user) throw new Error("USER_CREATE_READBACK_FAILED");
-      await E.DB.prepare("INSERT INTO events(type,page,user_id) VALUES('registration','auth',?)").bind(id).run();
+      try { await E.DB.prepare("INSERT INTO events(type,page,user_id) VALUES('registration','auth',?)").bind(id).run(); } catch { console.error("Registration analytics unavailable"); }
       return new Response(JSON.stringify({ user }), { status: 201, headers: { "content-type": "application/json", "set-cookie": await sessionCookie(id) } });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       console.error("student registration failed", message);
-      if (/unique|constraint/i.test(message)) return Response.json({ error: "هذا البريد مسجل بالفعل. اختر تسجيل الدخول." }, { status: 409 });
+      if (/UNIQUE constraint failed: users.email|users_email_unique/i.test(message)) return Response.json({ error: "هذا البريد مسجل بالفعل. اختر تسجيل الدخول." }, { status: 409 });
       try { await E.DB.prepare("INSERT INTO errors(message,page,severity,device) VALUES(?,?,?,?)").bind(`Registration: ${message}`.slice(0, 1000), "auth", "high", request.headers.get("user-agent") || "unknown").run(); } catch {}
       return Response.json({ error: "تعذر إنشاء الحساب الآن. حاول مرة أخرى بعد لحظات." }, { status: 500 });
     }
