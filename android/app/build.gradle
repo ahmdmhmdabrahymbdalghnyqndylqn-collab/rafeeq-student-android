@@ -18,7 +18,3 @@ android {
         main.assets.srcDirs = ["src/main/assets", "../../public"]
     }
 }
-
-dependencies {
-    implementation "androidx.webkit:webkit:1.12.1"
-}
