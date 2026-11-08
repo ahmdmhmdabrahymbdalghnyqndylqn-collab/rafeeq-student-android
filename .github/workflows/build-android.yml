@@ -49,7 +49,8 @@ jobs:
       - name: Publish direct-download release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: apk-${{ github.run_number }}
-          name: "Rafeeq Student APK ${{ github.run_number }}"
-          generate_release_notes: true
+          tag_name: apk-3
+          name: "Rafeeq Student APK"
+          make_latest: true
+          overwrite_files: true
           files: release/rafeeq-student.apk
