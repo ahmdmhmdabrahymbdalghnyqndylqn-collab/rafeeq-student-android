@@ -27,6 +27,9 @@ jobs:
           curl -fsSL https://services.gradle.org/distributions/gradle-8.9-bin.zip -o /tmp/gradle.zip
           unzip -q /tmp/gradle.zip -d /opt
 
+      - name: Bundle the 51-book catalog into the APK
+        run: node scripts/embed-library-catalog.mjs
+
       - name: Build APK
         working-directory: android
         run: /opt/gradle-8.9/bin/gradle -Pandroid.builder.sdkDownload=true :app:assembleDebug --no-daemon
