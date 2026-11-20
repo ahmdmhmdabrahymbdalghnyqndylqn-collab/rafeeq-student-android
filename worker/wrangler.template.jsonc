@@ -1,0 +1,12 @@
+{
+  "name": "rafeeq-private-teacher",
+  "main": "private-teacher.js",
+  "compatibility_date": "2026-11-20",
+  "ai": { "binding": "AI" },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "rafeeq-teacher", "database_id": "REPLACE_WITH_D1_DATABASE_ID" }
+  ],
+  "vectorize": [
+    { "binding": "VECTOR_INDEX", "index_name": "rafeeq-knowledge" }
+  ]
+}
