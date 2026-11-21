@@ -1,7 +1,7 @@
-const CHAT_MODEL = "@cf/qwen/qwen3.8-27b";
+const CHAT_MODEL = "@cf/google/gemma-4-26b-a4b-it";
 const EMBEDDING_MODEL = "@cf/baai/bge-m3";
-const MAX_MESSAGE_LENGTH = 1400;
-const MAX_CONTEXT_CHARS = 7200;
+const MAX_MESSAGE_LENGTH = 1100;
+const MAX_CONTEXT_CHARS = 3200;
 const MAX_INGEST_ITEMS = 30;
 const MAX_INGEST_TEXT = 4200;
 const MAX_REQUESTS_PER_HOUR = 30;
@@ -25,11 +25,22 @@ function text(value, max = MAX_MESSAGE_LENGTH) {
 
 function history(value) {
   if (!Array.isArray(value)) return [];
-  return value.slice(-6).flatMap((message) => {
+  return value.slice(-4).flatMap((message) => {
     const role = message?.role === "assistant" ? "assistant" : message?.role === "user" ? "user" : null;
     const content = text(message?.content, 900);
     return role && content ? [{ role, content }] : [];
   });
+}
+
+function quickReply(value) {
+  const normalized = value.replace(/[؟?!.,،]/gu, "").replace(/\s+/gu, " ").trim().toLowerCase();
+  if (/^(كيف حالك|كيفك|شو اخبارك|شو الأخبار|عامل ايه|عامل إيه|اخبارك|أخبارك)$/u.test(normalized)) {
+    return "الحمد لله أنا بخير، شكرًا لسؤالك. إنت كيفك؟ جاهز نرتب دراسة اليوم أو نراجع درسًا؟";
+  }
+  if (/^(مرحبا|أهلا|اهلا|السلام عليكم|هاي|hello)$/u.test(normalized)) {
+    return "أهلًا بك! اختر المادة إن أردت، ثم اسألني عن درس أو اطلب اختبارًا قصيرًا.";
+  }
+  return "";
 }
 
 async function embedding(env, value) {
@@ -70,7 +81,7 @@ async function rateLimit(request, env) {
 async function relevantChunks(env, question, subject) {
   const vector = await embedding(env, question);
   const matches = await env.VECTOR_INDEX.query(vector, {
-    topK: 6,
+    topK: 4,
     returnMetadata: "all",
     ...(subject ? { filter: { subject } } : {}),
   });
@@ -85,9 +96,14 @@ async function relevantChunks(env, question, subject) {
 }
 
 function systemPrompt(subject, unit, chunks) {
-  const references = chunks.length
-    ? chunks.map((chunk) => `[${chunk.book_title} - صفحة ${chunk.page}]\n${chunk.text}`).join("\n\n")
-    : "لا يوجد مقطع مفهرس مطابق للسؤال.";
+  let used = 0;
+  const references = chunks.reduce((parts, chunk) => {
+    const part = `[${chunk.book_title} - صفحة ${chunk.page}]\n${chunk.text}`;
+    if (used + part.length > MAX_CONTEXT_CHARS) return parts;
+    used += part.length;
+    parts.push(part);
+    return parts;
+  }, []).join("\n\n") || "لا يوجد مقطع مفهرس مطابق للسؤال.";
   return `أنت «المعلم الخاص» في تطبيق رفيق الطالب للثانوية. تكلّم بالعربية الواضحة، بنبرة ودودة ومهنية، ولا تكرر نفسك.
 
 المادة المختارة: ${subject || "غير محددة"}
@@ -98,7 +114,8 @@ function systemPrompt(subject, unit, chunks) {
 2) إن لم تكن المراجع كافية، صرّح بذلك ثم قدّم شرحًا عامًا واضحًا واطلب اسم الدرس أو صورة السؤال.
 3) عند طلب اختبار، أنشئ 5 أسئلة متنوعة مناسبة للمادة، ثم «مفتاح الإجابة» منفصلًا في النهاية.
 4) في المسائل، اشرح الخطوات ولا تكتفِ بالإجابة النهائية.
-5) اجعل الإجابة منظمة وقصيرة ما أمكن.
+5) اجعل الإجابة منظمة ومباشرة، ومن دون تحية أو تكرار بعد أول رسالة في المحادثة.
+6) ما لم يطلب الطالب تفصيلًا أو اختبارًا، لا تتجاوز الإجابة 150 كلمة عربية.
 
 المقاطع المرجعية:
 ${references}`;
@@ -112,6 +129,8 @@ async function chat(request, env) {
   if (!message) return json({ error: "اكتب سؤالك أولًا." }, 400);
 
   await rateLimit(request, env);
+  const directAnswer = quickReply(message);
+  if (directAnswer) return json({ answer: directAnswer, sources: [] });
   const chunks = await relevantChunks(env, message, subject);
   const output = await env.AI.run(CHAT_MODEL, {
     messages: [
@@ -119,9 +138,9 @@ async function chat(request, env) {
       ...history(body.history),
       { role: "user", content: message },
     ],
-    max_tokens: 850,
-    temperature: 0.25,
-    repetition_penalty: 1.08,
+    max_completion_tokens: 300,
+    chat_template_kwargs: { enable_thinking: false },
+    temperature: 0.2,
   });
   const answer = text(output?.response ?? output?.choices?.[0]?.message?.content, 7000);
   if (!answer) throw new Error("Model response is empty.");
