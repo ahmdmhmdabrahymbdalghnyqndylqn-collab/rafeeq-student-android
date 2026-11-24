@@ -54,6 +54,9 @@ importers:
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
+      '@types/react':
+        specifier: ^19.2.8
+        version: 19.3.0
       eslint:
         specifier: ^9.39.4
         version: 9.39.5(supports-color@8.1.1)
@@ -109,6 +112,9 @@ importers:
       '@types/jest':
         specifier: ^30.0.0
         version: 30.0.0
+      '@types/react':
+        specifier: ^19.2.8
+        version: 19.3.0
       eslint:
         specifier: ^9.39.4
         version: 9.39.5(supports-color@8.1.1)
