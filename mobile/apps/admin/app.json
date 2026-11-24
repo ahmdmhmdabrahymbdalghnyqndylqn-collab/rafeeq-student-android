@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "Rafeeq Admin",
+    "slug": "rafeeq-admin",
+    "scheme": "rafeeq-admin",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "icon": "./rafeeq-admin-icon.png",
+    "android": {
+      "package": "com.rafeeq.admin",
+      "adaptiveIcon": {
+        "foregroundImage": "./rafeeq-admin-icon.png",
+        "backgroundColor": "#092E72"
+      }
+    },
+    "plugins": ["expo-router", "expo-secure-store"],
+    "experiments": { "typedRoutes": true }
+  }
+}

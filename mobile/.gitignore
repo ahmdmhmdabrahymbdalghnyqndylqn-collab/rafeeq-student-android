@@ -1,0 +1,16 @@
+node_modules/
+.pnpm-store/
+install.log
+.expo/
+dist/
+coverage/
+*.log
+.env
+.env.*.local
+!.env.example
+android/
+ios/
+*.jks
+*.keystore
+*.p8
+*.mobileprovision

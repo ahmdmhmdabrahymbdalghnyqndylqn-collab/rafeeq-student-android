@@ -1,0 +1,45 @@
+name: Build Rafeeq Student APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/student-apk.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rafeeq/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: rafeeq/mobile/pnpm-lock.yaml
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @rafeeq/student typecheck
+      - run: pnpm --filter @rafeeq/student lint
+      - run: pnpm --filter @rafeeq/student test -- --runInBand
+      - run: pnpm --filter @rafeeq/student exec expo prebuild --platform android --no-install
+      - run: ./gradlew :app:assembleRelease --no-daemon
+        working-directory: rafeeq/mobile/apps/student/android
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rafeeq-student-apk
+          path: rafeeq/mobile/apps/student/android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error

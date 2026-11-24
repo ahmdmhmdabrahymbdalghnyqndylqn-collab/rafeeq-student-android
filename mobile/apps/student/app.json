@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "Rafeeq",
+    "slug": "rafeeq-student",
+    "scheme": "rafeeq",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "icon": "./assets/branding/rafeeq-app-icon.png",
+    "android": {
+      "package": "com.rafeeq.student",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/branding/rafeeq-app-icon.png",
+        "backgroundColor": "#092E72"
+      }
+    },
+    "plugins": ["expo-router", "expo-secure-store"],
+    "experiments": { "typedRoutes": true }
+  }
+}

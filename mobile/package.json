@@ -1,0 +1,23 @@
+{
+  "name": "rafeeq-mobile",
+  "private": true,
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev:student": "pnpm --filter @rafeeq/student start",
+    "dev:admin": "pnpm --filter @rafeeq/admin start",
+    "android:student": "pnpm --filter @rafeeq/student android",
+    "android:admin": "pnpm --filter @rafeeq/admin android",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "^3.7.4",
+    "typescript": "~5.9.3"
+  }
+}
