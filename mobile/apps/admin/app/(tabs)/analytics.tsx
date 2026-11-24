@@ -1,2 +1,14 @@
-import { View, Text } from 'react-native';
-export default function AnalyticsScreen() { return <View><Text>التحليلات</Text></View>; }
+import { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { AdminSurface, adminPalette } from '../../components/AdminSurface';
+import { getDashboardMetrics, type DashboardMetrics } from '../../lib/admin-data';
+
+export default function AnalyticsScreen() {
+  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
+  const [error, setError] = useState('');
+  const load = useCallback(async () => { try { setError(''); setMetrics(await getDashboardMetrics()); } catch (reason) { setError(reason instanceof Error ? reason.message : 'تعذر تحميل التحليلات.'); } }, []);
+  useEffect(() => { const timer = setTimeout(() => { void load(); }, 0); return () => clearTimeout(timer); }, [load]);
+  return <AdminSurface><ScrollView contentContainerStyle={styles.page}><Text style={styles.title}>التحليلات</Text><Text style={styles.body}>هذه الأرقام من البيانات الحقيقية المتاحة لحساب المدير، وليست تقديرات أو بيانات تجريبية.</Text>{!metrics && !error ? <ActivityIndicator size="large" color={adminPalette.blue}/> : null}{error ? <View style={styles.error}><Text style={styles.errorText}>{error}</Text><Pressable accessibilityRole="button" onPress={() => void load()}><Text style={styles.retry}>إعادة المحاولة</Text></Pressable></View> : null}{metrics ? <View style={styles.list}><Insight label="إجمالي حسابات الطلاب" value={metrics.total_students}/><Insight label="نمو آخر 24 ساعة" value={metrics.new_students_last_24h}/><Insight label="نشاط المكتبة خلال 24 ساعة" value={metrics.library_events_last_24h}/><Insight label="منافسات نشطة الآن" value={metrics.active_competitions}/><Insight label="طلبات تنتظر منافسًا" value={metrics.waiting_competitions}/></View> : null}</ScrollView></AdminSurface>;
+}
+function Insight({ label, value }: { label: string; value: number }) { return <View style={styles.item}><Text style={styles.value}>{value.toLocaleString('ar-EG')}</Text><Text style={styles.itemLabel}>{label}</Text></View>; }
+const styles = StyleSheet.create({ page: { padding: 20, gap: 14 }, title: { color: adminPalette.navy, fontSize: 28, fontWeight: '900', textAlign: 'right' }, body: { color: adminPalette.muted, lineHeight: 22, textAlign: 'right' }, list: { gap: 10 }, item: { padding: 16, borderRadius: 17, backgroundColor: adminPalette.card, borderWidth: 1, borderColor: adminPalette.border, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }, value: { color: adminPalette.blue, fontWeight: '900', fontSize: 24 }, itemLabel: { color: adminPalette.ink, fontWeight: '800', textAlign: 'right', flex: 1, marginLeft: 15 }, error: { borderRadius: 14, padding: 14, backgroundColor: '#FFF3F3', gap: 8 }, errorText: { color: adminPalette.danger, textAlign: 'right' }, retry: { color: adminPalette.blue, fontWeight: '900', textAlign: 'right' } });
