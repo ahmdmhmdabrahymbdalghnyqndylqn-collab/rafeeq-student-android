@@ -22,12 +22,12 @@ export default function CompleteProfileScreen() {
   const [message, setMessage] = useState('');
   const textAlign = direction === 'rtl' ? 'right' : 'left';
   const copy = useMemo(() => locale === 'ar' ? { title: 'أكمل بيانات الطالب', body: 'نحتاج هذه البيانات مرة واحدة لحماية الحساب واستعادته على أي هاتف.', name: 'اسم الطالب', country: 'البلد', track: 'المسار الدراسي', phone: 'رقم الهاتف', save: 'حفظ والمتابعة', invalid: 'أدخل اسمًا صحيحًا ورقم هاتف مطابقًا لبلدك.', unavailable: 'تعذر الوصول إلى بيانات الحساب. حاول تسجيل الدخول مرة أخرى.' } : { title: 'Complete student profile', body: 'We need these details once to protect and recover your account on any phone.', name: 'Student name', country: 'Country', track: 'Study track', phone: 'Phone number', save: 'Save and continue', invalid: 'Enter a valid name and a phone number that matches your country.', unavailable: 'We could not access this account. Try signing in again.' }, [locale]);
+  const fallbackName = String(session?.user.user_metadata.full_name ?? session?.user.user_metadata.name ?? session?.user.email?.split('@')[0] ?? '');
+  const displayedName = name || fallbackName;
 
   useEffect(() => {
     const client = supabase;
     if (!client || !session) return;
-    const fallbackName = String(session.user.user_metadata.full_name ?? session.user.user_metadata.name ?? session.user.email?.split('@')[0] ?? '');
-    setName(fallbackName);
     void client.from('profiles').select('display_name, country_code, study_track, phone_e164').eq('id', session.user.id).maybeSingle().then(({ data }) => {
       if (!data) return;
       setName(data.display_name ?? fallbackName);
@@ -35,21 +35,22 @@ export default function CompleteProfileScreen() {
       if (data.study_track === 'scientific' || data.study_track === 'literary' || data.study_track === 'math') setTrack(data.study_track);
       if (data.phone_e164) setPhone(data.phone_e164);
     });
-  }, [session]);
+  }, [fallbackName, session]);
 
   const save = useCallback(async () => {
     const client = supabase;
     const phoneE164 = normalizeStudentPhone(country, phone);
     if (!client || !session) { setMessage(copy.unavailable); return; }
-    if (name.trim().length < 2 || !phoneE164) { setMessage(copy.invalid); return; }
+    const effectiveName = name.trim() || fallbackName.trim();
+    if (effectiveName.length < 2 || !phoneE164) { setMessage(copy.invalid); return; }
     setBusy(true); setMessage('');
-    const { error } = await client.from('profiles').update({ display_name: name.trim(), country_code: country, study_track: track, phone_e164: phoneE164, preferred_locale: locale }).eq('id', session.user.id);
+    const { error } = await client.from('profiles').update({ display_name: effectiveName, country_code: country, study_track: track, phone_e164: phoneE164, preferred_locale: locale }).eq('id', session.user.id);
     if (error) setMessage(error.message);
     else { await refreshProfile(); router.replace('/'); }
     setBusy(false);
-  }, [copy, country, locale, name, phone, refreshProfile, session, track]);
+  }, [copy, country, fallbackName, locale, name, phone, refreshProfile, session, track]);
 
-  return <AppSurface><KeyboardAvoidingView behavior={Platform.select({ ios: 'padding' })} style={styles.flex}><ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled"><Text style={[styles.title, { textAlign }]}>{copy.title}</Text><Text style={[styles.body, { textAlign }]}>{copy.body}</Text><Field label={copy.name} value={name} onChangeText={setName} textAlign={textAlign} autoComplete="name"/><Text style={[styles.label, { textAlign }]}>{copy.country}</Text><View style={styles.choiceRow}>{(['EG', 'JO'] as const).map((value) => <Choice key={value} active={country === value} label={countryCopy[value][locale]} onPress={() => setCountry(value)}/>)}</View><Text style={[styles.label, { textAlign }]}>{copy.track}</Text><View style={styles.choiceRow}>{(['scientific', 'literary', 'math'] as const).map((value) => <Choice key={value} active={track === value} label={trackCopy[value][locale]} onPress={() => setTrack(value)}/>)}</View><Field label={copy.phone} value={phone} onChangeText={setPhone} textAlign="left" autoComplete="tel" keyboardType="phone-pad" placeholder={country === 'EG' ? '01XXXXXXXXX' : '07XXXXXXXX'}/><Pressable accessibilityRole="button" disabled={busy} onPress={() => void save()} style={[styles.primary, busy && styles.disabled]}>{busy ? <ActivityIndicator color={palette.white}/> : <Text style={styles.primaryText}>{copy.save}</Text>}</Pressable>{message ? <Text accessibilityRole="alert" style={[styles.message, { textAlign }]}>{message}</Text> : null}</ScrollView></KeyboardAvoidingView></AppSurface>;
+  return <AppSurface><KeyboardAvoidingView behavior={Platform.select({ ios: 'padding' })} style={styles.flex}><ScrollView contentContainerStyle={styles.page} keyboardShouldPersistTaps="handled"><Text style={[styles.title, { textAlign }]}>{copy.title}</Text><Text style={[styles.body, { textAlign }]}>{copy.body}</Text><Field label={copy.name} value={displayedName} onChangeText={setName} textAlign={textAlign} autoComplete="name"/><Text style={[styles.label, { textAlign }]}>{copy.country}</Text><View style={styles.choiceRow}>{(['EG', 'JO'] as const).map((value) => <Choice key={value} active={country === value} label={countryCopy[value][locale]} onPress={() => setCountry(value)}/>)}</View><Text style={[styles.label, { textAlign }]}>{copy.track}</Text><View style={styles.choiceRow}>{(['scientific', 'literary', 'math'] as const).map((value) => <Choice key={value} active={track === value} label={trackCopy[value][locale]} onPress={() => setTrack(value)}/>)}</View><Field label={copy.phone} value={phone} onChangeText={setPhone} textAlign="left" autoComplete="tel" keyboardType="phone-pad" placeholder={country === 'EG' ? '01XXXXXXXXX' : '07XXXXXXXX'}/><Pressable accessibilityRole="button" disabled={busy} onPress={() => void save()} style={[styles.primary, busy && styles.disabled]}>{busy ? <ActivityIndicator color={palette.white}/> : <Text style={styles.primaryText}>{copy.save}</Text>}</Pressable>{message ? <Text accessibilityRole="alert" style={[styles.message, { textAlign }]}>{message}</Text> : null}</ScrollView></KeyboardAvoidingView></AppSurface>;
 }
 
 function Field({ label, textAlign, ...props }: { label: string; textAlign: 'left' | 'right' } & ComponentProps<typeof TextInput>) { return <View style={styles.field}><Text style={[styles.label, { textAlign }]}>{label}</Text><TextInput {...props} accessibilityLabel={label} placeholderTextColor={palette.muted} style={[styles.input, { textAlign }]} /></View>; }

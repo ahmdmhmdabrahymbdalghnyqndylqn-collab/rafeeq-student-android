@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       mounted = false;
       subscription.subscription.unsubscribe();
     };
-  }, []);
+  }, [refreshProfile]);
 
   const value = useMemo(() => ({ configured: supabase !== null, ready, session, profileReady, profileComplete, refreshProfile }), [profileComplete, profileReady, ready, refreshProfile, session]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
