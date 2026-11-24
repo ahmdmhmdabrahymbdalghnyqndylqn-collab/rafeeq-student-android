@@ -11,7 +11,7 @@ const copy: Record<Locale, Dictionary> = {
     startStudy: 'ابدأ جلسة الدراسة', askTeacher: 'اسأل المعلم الخاص', thinking: 'جاري تجهيز إجابة دقيقة…',
     noTask: 'لا توجد مهمة قادمة', language: 'اللغة', arabic: 'العربية', english: 'English', settings: 'الإعدادات',
     libraryHint: 'اقرأ أو نزّل كتبك مباشرةً إلى هاتفك', competitionHint: 'تحدَّ طالبًا آخر في منافسة عادلة',
-    teacherHint: 'اسأل، راجع، أو أنشئ امتحانًا مخصصًا', welcome: 'رفيقك لتنظيم الدراسة والتعلّم بذكاء',
+    teacherHint: 'اسأل، راجع، أو أنشئ امتحانًا مخصصًا', welcome: 'رفيقك لتنظيم الدراسة والتعلّم بذكاء', logout: 'تسجيل الخروج', signedInAs: 'مسجّل باسم',
   },
   en: {
     home: 'Home', teacher: 'Private Teacher', planner: 'My Plan', competition: 'Competition', library: 'Library',
@@ -19,7 +19,7 @@ const copy: Record<Locale, Dictionary> = {
     startStudy: 'Start study session', askTeacher: 'Ask the private teacher', thinking: 'Preparing a thoughtful answer…',
     noTask: 'No upcoming task', language: 'Language', arabic: 'العربية', english: 'English', settings: 'Settings',
     libraryHint: 'Read or download your books directly to your phone', competitionHint: 'Challenge another student fairly',
-    teacherHint: 'Ask, revise, or create a tailored exam', welcome: 'Your companion for organized, smarter study',
+    teacherHint: 'Ask, revise, or create a tailored exam', welcome: 'Your companion for organized, smarter study', logout: 'Sign out', signedInAs: 'Signed in as',
   },
 };
 

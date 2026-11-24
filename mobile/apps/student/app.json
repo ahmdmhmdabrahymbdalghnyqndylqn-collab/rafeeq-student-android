@@ -25,7 +25,8 @@
           "color": "#0D6FEA",
           "defaultChannel": "study-reminders"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

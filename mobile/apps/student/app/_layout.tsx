@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as Notifications from 'expo-notifications';
+import { AuthProvider } from '../lib/auth';
 import { LocaleProvider } from '../lib/locale';
 
 Notifications.setNotificationHandler({
@@ -10,8 +11,10 @@ Notifications.setNotificationHandler({
 export default function RootLayout() {
   return (
     <LocaleProvider>
-      <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false }} />
+      <AuthProvider>
+        <StatusBar style="dark" />
+        <Stack screenOptions={{ headerShown: false }} />
+      </AuthProvider>
     </LocaleProvider>
   );
 }

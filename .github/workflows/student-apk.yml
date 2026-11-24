@@ -34,7 +34,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @rafeeq/student typecheck
       - run: pnpm --filter @rafeeq/student lint
-      - run: pnpm --filter @rafeeq/student test -- --runInBand
+      - run: pnpm --filter @rafeeq/student exec jest --config jest.config.cjs --runInBand
       - run: pnpm --filter @rafeeq/student exec expo prebuild --platform android --no-install
       - run: ./gradlew :app:assembleRelease --no-daemon
         working-directory: mobile/apps/student/android

@@ -1,4 +1,6 @@
+import 'react-native-url-polyfill/auto';
 import * as SecureStore from 'expo-secure-store';
+import { AppState, Platform } from 'react-native';
 import { createRafeeqSupabaseClient } from '@rafeeq/core';
 
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
@@ -12,3 +14,13 @@ export const supabase = url && publishableKey
   : null;
 
 export const supabaseIsConfigured = supabase !== null;
+
+// React Native has no browser lifecycle to refresh a login session for us.
+// Keep refresh active only while the app is foregrounded; no secret is stored
+// here, only the encrypted user session handled by SecureStore.
+if (supabase && Platform.OS !== 'web') {
+  AppState.addEventListener('change', (state) => {
+    if (state === 'active') supabase.auth.startAutoRefresh();
+    else supabase.auth.stopAutoRefresh();
+  });
+}
