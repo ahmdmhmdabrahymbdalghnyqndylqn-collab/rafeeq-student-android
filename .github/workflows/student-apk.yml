@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: rafeeq/mobile
+        working-directory: mobile
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-          cache-dependency-path: rafeeq/mobile/pnpm-lock.yaml
+          cache-dependency-path: mobile/pnpm-lock.yaml
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -37,9 +37,9 @@ jobs:
       - run: pnpm --filter @rafeeq/student test -- --runInBand
       - run: pnpm --filter @rafeeq/student exec expo prebuild --platform android --no-install
       - run: ./gradlew :app:assembleRelease --no-daemon
-        working-directory: rafeeq/mobile/apps/student/android
+        working-directory: mobile/apps/student/android
       - uses: actions/upload-artifact@v4
         with:
           name: rafeeq-student-apk
-          path: rafeeq/mobile/apps/student/android/app/build/outputs/apk/release/app-release.apk
+          path: mobile/apps/student/android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
